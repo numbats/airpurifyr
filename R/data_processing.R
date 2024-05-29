@@ -51,3 +51,5 @@ get_data <- function(value) {
   return(air_df)
 
 }
+
+get_data(value = value)
