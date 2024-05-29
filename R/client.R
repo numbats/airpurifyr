@@ -57,29 +57,14 @@ get_measurements_for_location <- function(
     )
 
     query_params <- modifyList(query_params, parsed_args)
-    api_response <- run_query(
-        endpoint_name = "measurements",
-        query_params = query_params
+    
+    collate_paginated_output(
+        endpoint = "measurements",
+        query_params = query_params,
+        max_pbservations = max_observations,
+        response_parser = get_measures
     )
 
-    measures_list <- list()
-
-    measures_list[[1]] <- get_measures(api_response)
-    i <- 1
-    
-    while (length(api_response[[2]]) == max_observations) {
-        query_params[["page"]] <- as.character(i + 1)
-        
-        api_response <- run_query(
-            endpoint_name = "measurements",
-            query_params = query_params
-        )
-
-        measures_list[[i + 1]] <- get_measures(api_response)
-
-        i <- i+1
-    }
-
-    do.call(rbind, measures_list)
-
 }
+
+
