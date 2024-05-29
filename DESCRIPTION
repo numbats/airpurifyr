@@ -24,5 +24,11 @@ Imports:
 URL: https://numbats.github.io/airpurifyr/
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    ozmaps,
+    sf,
+    dplyr,
+    colorspace,
+    tsibble,
+    gganimate
 VignetteBuilder: knitr
