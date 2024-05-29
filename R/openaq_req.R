@@ -1,22 +1,52 @@
+library(cli)
 library(httr)
-library(stringr)
+library(yaml)
 
 endpoint <- function(name, version=2){
-    paste0("https://api.openaq.org/v", version, "/", name)
+  paste0("https://api.openaq.org/v", version, "/", name)
 }
 
-get_response <- function(endpoint_name, query_params = list()){
+parse_malformed_request_response <- function(response_value) {
+  N = nchar(response_value)
+  normalised_responses <- yaml::yaml.load(
+    gsub("\\(", "[",
+      gsub("\\)", "]",
+        response_value
+      )
+    )
+  )
+  collated_errors <- list()
+  for (error_resp in normalised_responses) {
+    collated_errors <- append(
+      collated_errors, 
+      paste0(
+        "Error of type ",
+        error_resp$type,
+        " at ",
+        paste0(error_resp$loc, collapse=" "),
+        ". ",
+        error_resp$msg,
+        ". Input provided: ",
+        error_resp$input
+      )
+    )
+  }
+
+  paste0(collated_errors, collapse=" ")
+}
+
+run_query <- function(endpoint_name, query_params = list()){
   api_key <- get_openaq_api_key()
 
   query_string <- list(
-  page = "1",
-  offset = "0"
+    page = "1",
+    offset = "0"
   )
 
   full_query_string <- modifyList(
     query_string,
     query_params
-  )
+  ) |> lapply(I) # I wraps arguments so they do not get html escaped
 
   url <- endpoint(endpoint_name)
 
@@ -32,12 +62,14 @@ get_response <- function(endpoint_name, query_params = list()){
 
   if (response$status == 200) {
     response_value
-  }
-  else if (response$status == 422) {
-    message("response query malformed")
-    response_value
-  }
-  else {
-    message("unknown response code")
+  } else if (response$status == 422) {
+    cli_alert(
+      paste0(
+        "Response query malformed: ",
+        parse_malformed_request_response(response_value)
+      )
+    )
+  } else {
+    cli_alert(paste0("Unknown response code: ", as.character(response$status)))
   }
 }
