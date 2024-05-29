@@ -5,9 +5,9 @@
 \title{Get air quality measurements for a location}
 \usage{
 get_measurements_for_location(
-  country = "",
-  city = "",
-  location = "",
+  country = NULL,
+  city = NULL,
+  location = NULL,
   date_from = Sys.Date() - 365,
   date_to = Sys.Date(),
   is_mobile = FALSE,
