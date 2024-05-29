@@ -5,19 +5,16 @@ endpoint <- function(name, version=2){
     paste0("https://api.openaq.org/v", version, "/", name)
 }
 
-get_response <- function(endpoint_name, query_params){
+get_response <- function(endpoint_name, query_params = list()){
   api_key <- get_openaq_api_key()
 
   query_string <- list(
-  limit = "100",
   page = "1",
-  offset = "0",
-  sort = "asc",
-  order_by = "id"
+  offset = "0"
   )
 
-  full_query_string <- append(
-    query_string, 
+  full_query_string <- modifyList(
+    query_string,
     query_params
   )
 
@@ -27,7 +24,7 @@ get_response <- function(endpoint_name, query_params){
     "GET", url,
     query = full_query_string,
     add_headers(`X-API-Key` = api_key),
-    content_type("application/octet-stream"), 
+    content_type("application/octet-stream"),
     accept("application/json")
   )
 
