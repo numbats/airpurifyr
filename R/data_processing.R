@@ -39,12 +39,15 @@ collate_paginated_output <- function(
 
     output_list <- list()
 
+    cli::cli_progress_bar("Running OpenAQ API Query |")
     api_response <- run_query(endpoint, query_params)
     
     output_list[[1]] <- response_parser(api_response)
     i <- 1
 
     while (length(api_response[[2]]) == pagination_size){
+        #print(i)
+        cli::cli_progress_update()
         query_params[["page"]] <- as.character(i + 1)
 
         api_response <- run_query(
