@@ -2,7 +2,6 @@
 
 export(get_measurements_for_location)
 export(set_openaq_api_key)
-importFrom(httr,I)
 importFrom(httr,VERB)
 importFrom(httr,accept)
 importFrom(httr,add_headers)

@@ -1,3 +1,19 @@
+#' Get air quality measurements for a location
+#' 
+#' Gets the set of air quality measurements from the OpenAQ API. You can filter
+#' by location, date, and type of station
+#' 
+#' @param country Two-character ISO country code
+#' @param city String for the city of interest
+#' @param location smaller-geographical identifier (i..e suburb)
+#' @param date_from Date observations to start (will be converted to UTC)
+#' @param date_to Date observations will end (will be converted to UTC)
+#' @param is_mobile Include mobile station types
+#' @param max_observations Number of observations to be returned per page.
+#' Larger numbers mean less API calls but more single server load.
+#' @param ... Extra API parameters. Note all must be name-value pairs, and all
+#' values must be of type character.
+#' 
 #' @export
 get_measurements_for_location <- function(
     country = "",
@@ -6,7 +22,8 @@ get_measurements_for_location <- function(
     date_from = Sys.Date() - 365,
     date_to = Sys.Date(),
     is_mobile = FALSE,
-    max_observations = 1000
+    max_observations = 1000,
+    ...
 ) {
 
     assertthat::assert_that(inherits(date_from, "Date"))
@@ -28,6 +45,8 @@ get_measurements_for_location <- function(
         is_mobile = tolower(as.character(is_mobile)),
         limit = as.character(max_observations)
     )
+
+    query_params <- modifyList(query_params, list(...))
 
     api_response <- run_query(
         endpoint_name = "measurements",
