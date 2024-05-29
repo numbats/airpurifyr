@@ -24,4 +24,8 @@ tb <- get_measures(qr)
 unique(tb$parameter)
 nrow(tb)
 
-a <- get_measurements_for_location(country = "AU", city = "Melbourne", location = "Footscray", max_observations = 100, date_from = lubridate::ymd("2024-05-24"), parameter = c("pm10", "pm25"))
+a <- get_measurements_for_location(country = "AU", city = "Melbourne",
+                                   location = "Footscray",
+                                   max_observations = 100,
+                                   date_from = lubridate::ymd("2024-05-24"),
+                                   parameter = c("pm10", "pm25"))
