@@ -5,7 +5,7 @@
 
 ## Installation
 
-You can install the development version of airpurifyr from
+You can install the development version of `airpurifyr` from
 [GitHub](https://github.com/) with:
 
 ``` r
