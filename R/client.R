@@ -16,9 +16,9 @@
 #' 
 #' @export
 get_measurements_for_location <- function(
-    country = "",
-    city = "",
-    location = "",
+    country = NULL,
+    city = NULL,
+    location = NULL,
     date_from = Sys.Date() - 365,
     date_to = Sys.Date(),
     is_mobile = FALSE,
@@ -28,9 +28,9 @@ get_measurements_for_location <- function(
 
     assertthat::assert_that(inherits(date_from, "Date"))
     assertthat::assert_that(inherits(date_to, "Date"))
-    assertthat::assert_that(inherits(country, "character"))
-    assertthat::assert_that(inherits(city, "character"))
-    assertthat::assert_that(inherits(location, "character"))
+    assertthat::assert_that(inherits(country, "character") | is.null(country))
+    assertthat::assert_that(inherits(city, "character") | is.null(city))
+    assertthat::assert_that(inherits(location, "character") | is.null(location))
     assertthat::assert_that(inherits(is_mobile, "logical"))
 
     attr(date_from, "tzone") <- "UTC"
