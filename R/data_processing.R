@@ -1,13 +1,11 @@
 library(tibble)
-library(dplyr)
 library(purrr)
 
-get_data <- function(value) {
+get_measures <- function(req_cont) {
 
   # To obtain the response
-  locations_list <- value[[2]]
+  locations_list <- req_cont[[2]]
 
-  # Convert locations_list to tibble
   # Extract data from locations_list and combine into air_df
   air_df <- locations_list |>
     map_dfr(~ tibble(
@@ -27,4 +25,3 @@ get_data <- function(value) {
 
 }
 
-get_data(value = value)
