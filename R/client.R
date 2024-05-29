@@ -35,7 +35,17 @@ get_measurements_for_location <- function(
 
     attr(date_from, "tzone") <- "UTC"
     attr(date_to, "tzone") <- "UTC"
+
+    country <- restify_vector(country)
+    city <- restify_vector(city)
+    location <- restify_vector(location)
     
+    additional_args <- list(...)
+    parsed_args <- lapply(seq_along(additional_args), function(i) {
+        restify_vector(input = additional_args[[i]], name = names(additional_args)[i])
+    })
+    names(parsed_args) <- names(additional_args)
+
     query_params <- list(
         country = country,
         city = city,
@@ -46,8 +56,7 @@ get_measurements_for_location <- function(
         limit = as.character(max_observations)
     )
 
-    query_params <- modifyList(query_params, list(...))
-
+    query_params <- modifyList(query_params, parsed_args)
     api_response <- run_query(
         endpoint_name = "measurements",
         query_params = query_params
