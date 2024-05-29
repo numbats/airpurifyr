@@ -22,3 +22,7 @@ Imports:
     tibble,
     yaml
 URL: https://numbats.github.io/airpurifyr/
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
