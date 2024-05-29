@@ -61,10 +61,42 @@ get_measurements_for_location <- function(
     collate_paginated_output(
         endpoint = "measurements",
         query_params = query_params,
-        max_pbservations = max_observations,
+        pagination_size = max_observations,
         response_parser = get_measures
     )
 
 }
 
 
+get_cities <- function(
+    country = NULL,
+    max_observations = 1000,
+    ...
+) {
+
+    assertthat::assert_that(inherits(country, "character") | is.null(country))
+
+    country <- restify_vector(country)
+
+    additional_args <- list(...)
+    parsed_args <- lapply(seq_along(additional_args), function(i) {
+        restify_vector(input = additional_args[[i]], name = names(additional_args)[i])
+    })
+    names(parsed_args) <- names(additional_args)
+
+    query_params <- list(
+        country = country,
+        limit = as.character(max_observations)
+    )
+
+    query_params <- modifyList(query_params, parsed_args)
+    
+    collate_paginated_output(
+        endpoint = "cities",
+        query_params = query_params,
+        pagination_size =  = max_observations,
+        response_parser = get_cities
+    )
+
+
+}
