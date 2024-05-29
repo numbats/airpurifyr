@@ -1,6 +1,31 @@
-library(tibble)
-library(purrr)
-library(lubridate)
+#' Get Air Quality Measures
+#'
+#' This function extracts air quality measures from a parsed API response.
+#'
+#' @param req_cont A list containing the parsed API response. The location data
+#'                 should be stored in the second element of this list.
+#'
+#' @return A tibble containing air quality measures with columns for location ID,
+#'         location name, parameter name, measured value, date and time of measurement
+#'         (in UTC), unit of measurement, latitude, longitude, country, and city.
+#'
+#' @import tibble
+#' @import purrr
+#' @import lubridate
+#'
+#' @examples
+#' # Sample usage:
+#' library(tibble)
+#' library(purrr)
+#' library(lubridate)
+#'
+#' # Sample parsed API response
+#' req_cont <- content(response, "parsed")
+#'
+#' # Get air quality measures
+#' measures <- get_measures(req_cont)
+#'
+#' @export
 
 get_measures <- function(req_cont) {
 
