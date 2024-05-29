@@ -3,5 +3,5 @@ set_openaq_api_key <- function(api_key) {
 }
 
 get_openaq_api_key <- function() {
-    Sys.getenv(PURIFYR_OPENAQ_API_KEY)
+    Sys.getenv("PURIFYR_OPENAQ_API_KEY")
 }
