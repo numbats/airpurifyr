@@ -1,0 +1,82 @@
+---
+title: "Mapping Air Quality in Australia"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{map-in-australia}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(airpurifyr)
+library(ozmaps)
+library(sf)
+library(dplyr)
+library(ggplot2)
+
+states <- ozmaps::ozmap_states |>
+  filter(NAME %in% c("New South Wales", "Victoria"))
+
+ggplot(states) +
+  geom_sf()
+```
+
+```{r}
+a <- get_measurements_for_location(
+  country = "AU", 
+  #city = c("Melbourne", "Sydney"),
+  max_observations = 1000, 
+  date_from = lubridate::ymd("2020-01-01"),
+  date_to = lubridate::ymd("2020-01-14"),
+  parameter = "pm25"
+)
+
+locations_of_interest <- a |>
+  filter(long > 141, lat < -31) |>
+  distinct(location_id) |>
+  pull()
+
+station_data <- get_measurements_for_location(
+  country = "AU",
+  location = locations_of_interest,
+  max_observations = 10000,
+  date_from = lubridate::ymd("2019-12-01"),
+  date_to = lubridate::ymd("2020-02-01"),
+  parameter = "pm25"
+)
+```
+
+```{r}
+stations <- station_data |>
+  distinct(lat, long) |>
+  filter(long > 141, lat < -31)
+
+ggplot(states) +
+  geom_sf() +
+  geom_point(aes(x=long, y=lat), data = stations)
+```
+
+```{r}
+time_series_stations <- station_data |>
+  as_tsibble(index = date_utc, key = location) |>
+  fill_gaps(value = 1, .start = min(station_data$date_utc)) |>
+  group_by(location) |>
+  tidyr::fill(lat, long, .direction = "downup")
+
+animated_plot <- ggplot() +
+  geom_sf(data = states) +
+  geom_point(aes(x = long, y = lat, colour = log(value)), data = time_series_stations) +
+  transition_time(date_utc) +
+  labs(subtitle = "Date: {frame_time}")
+
+anim_save("air_quality_map.gif", nframes = 300, fps = 10, width = 800, height = 600, animation = animated_plot, renderer = gifski_renderer())
+
+
+```
