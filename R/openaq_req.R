@@ -66,6 +66,8 @@ run_query <- function(endpoint_name, query_params = list()){
         parse_malformed_request_response(response_value)
       )
     )
+  } else if (response$status == 408) {
+    cli::cli_alert("Timeout from server (error code 408); please retry.")
   } else {
     cli::cli_alert(paste0("Unknown response code: ", as.character(response$status)))
   }
