@@ -51,3 +51,4 @@ rsconnect/
 docs
 
 .Rprofile
+inst/doc
