@@ -14,7 +14,7 @@ parse_malformed_request_response <- function(response_value) {
   collated_errors <- list()
   for (error_resp in normalised_responses) {
     collated_errors <- append(
-      collated_errors, 
+      collated_errors,
       paste0(
         "Error of type ",
         error_resp$type,
