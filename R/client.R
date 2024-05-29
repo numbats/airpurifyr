@@ -62,12 +62,13 @@ get_measurements_for_location <- function(
         endpoint = "measurements",
         query_params = query_params,
         pagination_size = max_observations,
-        response_parser = get_measures
+        response_parser = parse_measures
     )
 
 }
 
 
+#' @export
 get_cities <- function(
     country = NULL,
     max_observations = 1000,
@@ -95,8 +96,6 @@ get_cities <- function(
         endpoint = "cities",
         query_params = query_params,
         pagination_size = max_observations,
-        response_parser = get_cities
+        response_parser = parse_cities
     )
-
-
 }

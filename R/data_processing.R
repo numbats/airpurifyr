@@ -89,7 +89,7 @@ collate_paginated_output <- function(
 #' measures <- get_measures(req_cont)
 #'
 
-get_measures <- function(req_cont) {
+parse_measures <- function(req_cont) {
 
   # To obtain the response
   measurements_list <- req_cont[[2]]
@@ -114,7 +114,7 @@ get_measures <- function(req_cont) {
 }
 
 
-get_cities <- function(req_cont) {
+parse_cities <- function(req_cont) {
   
   # Extract out the results part of the response
   cities_info <- req_cont[[2]]
