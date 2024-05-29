@@ -72,6 +72,9 @@ for (loc in seq_along(locations_list)) {
 
   location_tibble <- bind_rows(location_tibble, loc_n)
 
+  ## Obtain the parameter list
+  param_list <- spec_loc_list$parameters
+
   # Create an empty tibble with column names
   param_tibble <- tibble(
     location_id = numeric(0),
@@ -84,7 +87,7 @@ for (loc in seq_along(locations_list)) {
 
   for (param in seq_along(param_list)) {
 
-    param_n <- tibble(location_id = data_list$id,
+    param_n <- tibble(location_id = spec_loc_list$id,
                       param_id = param_list[[param]]$id,
                       param_name = param_list[[param]]$parameter,
                       unit = param_list[[param]]$unit,
