@@ -9,7 +9,8 @@ Authors@R: c(
     person("Michael", "Lydeamore", , "michael.lydeamore@monash.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-6515-827X"))
   )
-Description: What the package does (one paragraph).
+Description: This package allows users to easily retrieve air quality 
+data from around the world using the OpenAQ platform.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
