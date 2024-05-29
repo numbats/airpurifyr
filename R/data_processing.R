@@ -49,7 +49,7 @@ collate_paginated_output <- function(
 
         api_response <- run_query(
             endpoint_name = endpoint,
-            query_params = query_params,
+            query_params = query_params
         )
 
         output_list[[i + 1]] <- response_parser(api_response)
