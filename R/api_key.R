@@ -3,17 +3,14 @@ set_openaq_api_key <- function(api_key) {
 }
 
 get_openaq_api_key <- function() {
-  tryCatch(
-    Sys.getenv("PURIFYR_OPENAQ_API_KEY"),
-    error = function(e) {
-      warning(
-        paste0(
-          "Could not find environment variable PURIFYR_OPENAQ_API_KEY, ",
-          "proceeding with no key; your rate limit will be reduced"
-        )
-      )
+    key <- Sys.getenv("PURIFYR_OPENAQ_API_KEY")
 
-      NULL
-    },
-  )
+    if (key == "") {
+        cli::cli_alert_warning("No API key detected. Set using {.code set_openaq_api_key()}")
+
+        # Don't really want to print the API key if it's blank but need to return something
+        return(invisible(key))
+    }
+
+    key
 }
