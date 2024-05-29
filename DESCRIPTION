@@ -17,3 +17,4 @@ Imports:
     purrr,
     tibble,
     yaml
+URL: https://numbats.github.io/airpurifyr/
