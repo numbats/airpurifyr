@@ -18,19 +18,9 @@ queryString <- list(
 response <- VERB("GET", url, query = queryString, content_type("application/octet-stream"), accept("application/json"))
 value <- content(response, "parsed")
 
-# content(response, "parsed")[[2]] ## Go to response
-# content(response, "parsed")[[2]][1] ## Go to a location (should goes from 1 to 100). This should be pass as a paramater 100
-#
-# data_list <- content(response, "parsed")[[2]][1][[1]] ## Go inside the list
-#
-# tibble(location_id = data_list$id,
-#        city = data_list$city,
-#        name = data_list$name,
-#        country = data_list$country,
-#        lat = data_list$coordinates$latitude,
-#        long = data_list$coordinates$longitude
-#        )
 
+
+## To create an empty tibble to store the data
 air_df <- tibble(
   location_id = numeric(0),
   city = character(0),
@@ -45,9 +35,10 @@ air_df <- tibble(
   last_updated = character(0)
 )
 
+## To obtain the response
 locations_list <- content(response, "parsed")[[2]]
 
-# Create an empty tibble with column names
+# Create an empty tibble with to store location data
 location_tibble <- tibble(
   location_id = numeric(0),
   city = character(0),
@@ -57,11 +48,13 @@ location_tibble <- tibble(
   long = numeric(0)
 )
 
+## To obtain location data along with the parameters corresponding to that
 for (loc in seq_along(locations_list)) {
 
   ## Get an specific location
   spec_loc_list <- locations_list[loc][[1]]
 
+  ## Empty tibble to store locations info only
   loc_n <- tibble(location_id = spec_loc_list$id,
                   city = spec_loc_list$city,
                   name = spec_loc_list$name,
@@ -70,12 +63,13 @@ for (loc in seq_along(locations_list)) {
                   long = spec_loc_list$coordinates$longitude
   )
 
+  ## Binding the location data
   location_tibble <- bind_rows(location_tibble, loc_n)
 
   ## Obtain the parameter list
   param_list <- spec_loc_list$parameters
 
-  # Create an empty tibble with column names
+  # Create an empty tibble to store the parameter info
   param_tibble <- tibble(
     location_id = numeric(0),
     param_name = character(0),
@@ -85,6 +79,7 @@ for (loc in seq_along(locations_list)) {
     last_updated = character(0)
   )
 
+  # To obtain parameter info for each locations
   for (param in seq_along(param_list)) {
 
     param_n <- tibble(location_id = spec_loc_list$id,
@@ -100,6 +95,7 @@ for (loc in seq_along(locations_list)) {
 
   }
 
+  ## To join the location and parameter data
   air_df_n <- inner_join(location_tibble, param_tibble, by = "location_id")
 
   air_df <- bind_rows(air_df, air_df_n)
@@ -107,12 +103,4 @@ for (loc in seq_along(locations_list)) {
 }
 
 
-# param_list <- data_list$parameters
-# tibble(param_id = param_list[[1]]$id,
-#        name = param_list[[1]]$parameter,
-#        unit = param_list[[1]]$unit,
-#        count = param_list[[1]]$count,
-#        average = param_list[[1]]$average,
-#        last_updated = param_list[[1]]$lastUpdated
-# )
 
