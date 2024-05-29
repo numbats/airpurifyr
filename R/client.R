@@ -94,7 +94,7 @@ get_cities <- function(
     collate_paginated_output(
         endpoint = "cities",
         query_params = query_params,
-        pagination_size =  = max_observations,
+        pagination_size = max_observations,
         response_parser = get_cities
     )
 
