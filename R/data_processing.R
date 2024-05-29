@@ -9,9 +9,9 @@
 #'         location name, parameter name, measured value, date and time of measurement
 #'         (in UTC), unit of measurement, latitude, longitude, country, and city.
 #'
-#' @import tibble
-#' @import purrr
-#' @import lubridate
+#' @importFrom tibble tibble
+#' @importFrom purrr map_dfr
+#' @importFrom lubridate ymd_hms
 #'
 #' @examples
 #' # Sample usage:
@@ -25,7 +25,6 @@
 #' # Get air quality measures
 #' measures <- get_measures(req_cont)
 #'
-#' @export
 
 get_measures <- function(req_cont) {
 

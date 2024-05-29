@@ -1,7 +1,3 @@
-library(cli)
-library(httr)
-library(yaml)
-
 endpoint <- function(name, version=2){
   paste0("https://api.openaq.org/v", version, "/", name)
 }
@@ -35,6 +31,7 @@ parse_malformed_request_response <- function(response_value) {
   paste0(collated_errors, collapse=" ")
 }
 
+#' @importFrom httr VERB add_headers content content_type accept
 run_query <- function(endpoint_name, query_params = list()){
   api_key <- get_openaq_api_key()
 
@@ -63,13 +60,13 @@ run_query <- function(endpoint_name, query_params = list()){
   if (response$status == 200) {
     response_value
   } else if (response$status == 422) {
-    cli_alert(
+    cli::cli_alert(
       paste0(
         "Response query malformed: ",
         parse_malformed_request_response(response_value)
       )
     )
   } else {
-    cli_alert(paste0("Unknown response code: ", as.character(response$status)))
+    cli::cli_alert(paste0("Unknown response code: ", as.character(response$status)))
   }
 }
