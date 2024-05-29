@@ -14,7 +14,7 @@ get_measures <- function(req_cont) {
       location = .x$location,
       parameter = .x$parameter,
       value = .x$value,
-      date_utc = as_date(.x$date$utc),
+      date_utc = ymd_hms(.x$date$utc),
       unit = .x$unit,
       lat = .x$coordinates$latitude,
       long = .x$coordinates$longitude,
