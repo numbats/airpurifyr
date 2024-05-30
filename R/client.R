@@ -14,6 +14,8 @@
 #' @param ... Extra API parameters. Note all must be name-value pairs, and all
 #' values must be of type character.
 #' 
+#' @importFrom utils modifyList
+#' 
 #' @export
 get_measurements_for_location <- function(
     country = NULL,
@@ -67,7 +69,7 @@ get_measurements_for_location <- function(
 
 }
 
-
+#' @importFrom utils modifyList
 #' @export
 get_cities <- function(
     country = NULL,

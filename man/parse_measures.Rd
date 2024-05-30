@@ -19,7 +19,7 @@ location name, parameter name, measured value, date and time of measurement
 This function extracts air quality measures from a parsed API response.
 }
 \examples{
-# Sample usage:
+\dontrun{
 library(tibble)
 library(purrr)
 library(lubridate)
@@ -29,5 +29,6 @@ req_cont <- content(response, "parsed")
 
 # Get air quality measures
 measures <- get_measures(req_cont)
+}
 
 }

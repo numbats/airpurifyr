@@ -26,22 +26,23 @@ due to pagination in the API. Assumes that there is a parser for the JSON respon
 from the API.
 }
 \examples{
-
+\dontrun{
 # Construct a query
 endpoint <- "measurements"
 query_params <- list(
-     location = "Melbourne", 
-     date_from="2024-05-24", 
-     date_to="2024-05-25",
-     limit="100"
+  location = "Melbourne",
+  date_from = "2024-05-24",
+  date_to = "2024-05-25",
+  limit = "100"
 )
 
 # Paginate over results
 collate_paginated_output(
- endpoint = endpoint,
- query_params = query_params,
- pagination_size = 100,
- response_parser = get_measures
+  endpoint = endpoint,
+  query_params = query_params,
+  pagination_size = 100,
+  response_parser = get_measures
 )
+}
 
 }

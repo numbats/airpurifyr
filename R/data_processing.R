@@ -1,66 +1,64 @@
 
 #' Collate paginated output for a given query
-#' 
-#' Collates output for a given query, where the query must be called multiple times 
+#'
+#' Collates output for a given query, where the query must be called multiple times
 #' due to pagination in the API. Assumes that there is a parser for the JSON response
 #' from the API.
-#' 
+#'
 #' @param endpoint Endpoint of the API
 #' @param query_params List of parameters to pass to the API, values must be strings
 #' @param pagination_size The size of the response returned (the page size). Should be equal to the value in the query_params
 #' @param response_parser A callable that parses the response into something that can be concatenated
-#' 
-#' @examples 
-#' 
+#'
+#' @examples
+#' \dontrun{
 #' # Construct a query
 #' endpoint <- "measurements"
 #' query_params <- list(
-#'      location = "Melbourne", 
-#'      date_from="2024-05-24", 
-#'      date_to="2024-05-25",
-#'      limit="100"
+#'   location = "Melbourne",
+#'   date_from = "2024-05-24",
+#'   date_to = "2024-05-25",
+#'   limit = "100"
 #' )
-#' 
+#'
 #' # Paginate over results
 #' collate_paginated_output(
-#'  endpoint = endpoint,
-#'  query_params = query_params,
-#'  pagination_size = 100,
-#'  response_parser = get_measures
+#'   endpoint = endpoint,
+#'   query_params = query_params,
+#'   pagination_size = 100,
+#'   response_parser = get_measures
 #' )
-#' 
-
+#' }
+#'
 collate_paginated_output <- function(
     endpoint,
     query_params,
     pagination_size,
-    response_parser
-) {
+    response_parser) {
+  output_list <- list()
 
-    output_list <- list()
+  cli::cli_progress_bar("Running OpenAQ API Query |")
+  api_response <- run_query(endpoint, query_params)
 
-    cli::cli_progress_bar("Running OpenAQ API Query |")
-    api_response <- run_query(endpoint, query_params)
-    
-    output_list[[1]] <- response_parser(api_response)
-    i <- 1
+  output_list[[1]] <- response_parser(api_response)
+  i <- 1
 
-    while (length(api_response[[2]]) == pagination_size){
-        #print(i)
-        cli::cli_progress_update()
-        query_params[["page"]] <- as.character(i + 1)
+  while (length(api_response[[2]]) == pagination_size) {
+    # print(i)
+    cli::cli_progress_update()
+    query_params[["page"]] <- as.character(i + 1)
 
-        api_response <- run_query(
-            endpoint_name = endpoint,
-            query_params = query_params
-        )
+    api_response <- run_query(
+      endpoint_name = endpoint,
+      query_params = query_params
+    )
 
-        output_list[[i + 1]] <- response_parser(api_response)
+    output_list[[i + 1]] <- response_parser(api_response)
 
-        i <- i + 1
-    }
+    i <- i + 1
+  }
 
-    do.call(rbind, output_list)
+  do.call(rbind, output_list)
 }
 
 
@@ -80,7 +78,7 @@ collate_paginated_output <- function(
 #' @importFrom lubridate ymd_hms
 #'
 #' @examples
-#' # Sample usage:
+#' \dontrun{
 #' library(tibble)
 #' library(purrr)
 #' library(lubridate)
@@ -90,6 +88,7 @@ collate_paginated_output <- function(
 #'
 #' # Get air quality measures
 #' measures <- get_measures(req_cont)
+#' }
 #'
 
 parse_measures <- function(req_cont) {
