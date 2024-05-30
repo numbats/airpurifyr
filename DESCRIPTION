@@ -30,7 +30,8 @@ Suggests:
     dplyr,
     colorspace,
     tsibble,
-    gganimate
+    gganimate,
+    tidyr
 VignetteBuilder: knitr
 Depends: 
     R (>= 2.10)
