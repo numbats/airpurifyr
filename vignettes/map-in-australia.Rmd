@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-This helps you to understand 
+Here we walk through a basic workflow for working with OpenAQ data inside `airpurifyr`. The aim is to produce some plots about the [2019-20 Australian Bushfire Season](https://en.wikipedia.org/wiki/2019%E2%80%9320_Australian_bushfire_season), where air quality was extremely poor.
 
 ```{r setup, message = FALSE, warning = FALSE}
 library(airpurifyr)
@@ -27,7 +27,11 @@ library(tsibble)
 library(gganimate)
 ```
 
-```{r, eval = FALSE}
+The first step when working with `airpurifyr` is to set your API key. Register your key at [https://explore.openaq.org/register](https://explore.openaq.org/register), and set this key using `set_openaq_api_key()`. Note you _can_ access data without an API key, but it is heavily restricted, so the package will give you a warning for each query you run without an API key set.
+
+With your API key set, our first task is to find all the locations on the east coast of Australia. This is non-trivial, as the "locations" provided by OpenAQ related to sensors rather than physical locations. The easiest (but most API intensive) method to get locations is to download for a large region, and then filter.
+
+```{r all-aus-locations, eval = FALSE}
 all_aus_locations <- get_measurements_for_location(
   country = "AU",
   max_observations = 1000,
@@ -35,7 +39,15 @@ all_aus_locations <- get_measurements_for_location(
   date_to = lubridate::ymd("2020-01-14"),
   parameter = "pm25"
 )
+```
 
+Here, we have asked for data from Australia, from 1 Jan 2020 to 14 Jan 2020, restricted to pm2.5. Restricting the date range and the parameter means that we need less API calls. Considering we are only using this data to get a list of stations, the smaller the set the better.
+
+We recommend using about two weeks of time to get locations, as not all sensors report on all days.
+
+Next, we filter down these locations using latitude and longitude, and pull down the data we actually want for a much longer period of time.
+
+```{r filter-locations, eval = FALSE}
 locations_of_interest <- all_aus_locations |>
   # East coast of Australia (roughly)
   dplyr::filter(long > 141, lat < -31) |>
@@ -52,6 +64,16 @@ au_east_coast_2020 <- get_measurements_for_location(
 )
 ```
 
+If you run this example, you'll notice this query takes a very long time. This is because it is quite a few locations for 90 days, with sensors generally reporting hourly. Here we have increased the `max_observations` parameter which makes each query larger but reduces the number of queries. If you are having troubles with Error 408 (HTTP timeout) then this can be a fix.
+
+The resulting data looks like this:
+
+```{r head-data}
+head(au_east_coast_2020)
+```
+
+We can visualise the stations by looking at their latitude and longitude from the dataset.
+
 ```{r}
 states <- ozmaps::ozmap_states |>
   filter(NAME %in% c("New South Wales", "Victoria"))
@@ -64,19 +86,29 @@ ggplot(states) +
   geom_point(aes(x=long, y=lat), data = stations)
 ```
 
-```{r}
+You can see that stations are most dense near major cities, with very little monitoring occurring in regional Australia.
+
+We can look at frequency reporting using a dotplot.
+
+```{r, fig.width=6}
+ggplot(au_east_coast_2020, aes(x = date_utc, y = value, color = location)) +
+  geom_point() +
+  guides(colour = "none") +
+  labs(x = "Date", y = "pm2.5") +
+  geom_hline(aes(yintercept = 500), linetype = "dashed")
+```
+
+Here, each set of dots represents one station. You can see that there are patches of missingness across all stations.
+
+You can also see the effects of the fires, represented by the large spikes in pm2.5 measurements. According to the [Victorian Environmental Protection Authority](https://www.epa.vic.gov.au/for-community/environmental-information/air-quality/pm25-particles-in-the-air), pm2.5 levels above 500 (marked by the dashed line in the previous plot) are considered "extremely poor".
+
+```{r, eval = FALSE, echo = FALSE}
 time_series_stations <- au_east_coast_2020 |>
   as_tsibble(index = date_utc, key = location) |>
   fill_gaps(value = 1, .start = min(au_east_coast_2020$date_utc)) |>
   group_by(location) |>
   tidyr::fill(lat, long, .direction = "downup")
 
-ggplot(au_east_coast_2020, aes(x = date_utc, y = value, color = location)) +
-  geom_point() +
-  guides(colour = "none")
-```
-
-```{r, eval = FALSE, echo = FALSE}
 animated_plot <- ggplot() +
   geom_sf(data = states) +
   geom_point(aes(x = long, y = lat, colour = log(value)), data = time_series_stations) +
