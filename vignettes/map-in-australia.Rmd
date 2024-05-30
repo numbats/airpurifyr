@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 This helps you to understand 
 
-```{r setup}
+```{r setup, message = FALSE, warning = FALSE}
 library(airpurifyr)
 library(ozmaps)
 library(sf)
@@ -25,30 +25,24 @@ library(ggplot2)
 library(colorspace)
 library(tsibble)
 library(gganimate)
-
-states <- ozmaps::ozmap_states |>
-  filter(NAME %in% c("New South Wales", "Victoria"))
-
-ggplot(states) +
-  geom_sf()
 ```
 
-```{r}
-a <- get_measurements_for_location(
-  country = "AU", 
-  #city = c("Melbourne", "Sydney"),
-  max_observations = 1000, 
+```{r, eval = FALSE}
+all_aus_locations <- get_measurements_for_location(
+  country = "AU",
+  max_observations = 1000,
   date_from = lubridate::ymd("2020-01-01"),
   date_to = lubridate::ymd("2020-01-14"),
   parameter = "pm25"
 )
 
-locations_of_interest <- a |>
-  filter(long > 141, lat < -31) |>
-  distinct(location) |>
-  pull()
+locations_of_interest <- all_aus_locations |>
+  # East coast of Australia (roughly)
+  dplyr::filter(long > 141, lat < -31) |>
+  dplyr::distinct(location) |>
+  dplyr::pull()
 
-station_data <- get_measurements_for_location(
+au_east_coast_2020 <- get_measurements_for_location(
   country = "AU",
   location = locations_of_interest,
   max_observations = 10000,
@@ -59,9 +53,11 @@ station_data <- get_measurements_for_location(
 ```
 
 ```{r}
-stations <- station_data |>
-  distinct(lat, long) |>
-  filter(long > 141, lat < -31)
+states <- ozmaps::ozmap_states |>
+  filter(NAME %in% c("New South Wales", "Victoria"))
+
+stations <- au_east_coast_2020 |>
+  distinct(lat, long)
 
 ggplot(states) +
   geom_sf() +
@@ -69,20 +65,25 @@ ggplot(states) +
 ```
 
 ```{r}
-time_series_stations <- station_data |>
+time_series_stations <- au_east_coast_2020 |>
   as_tsibble(index = date_utc, key = location) |>
-  fill_gaps(value = 1, .start = min(station_data$date_utc)) |>
+  fill_gaps(value = 1, .start = min(au_east_coast_2020$date_utc)) |>
   group_by(location) |>
   tidyr::fill(lat, long, .direction = "downup")
 
+ggplot(au_east_coast_2020, aes(x = date_utc, y = value, color = location)) +
+  geom_point() +
+  guides(colour = "none")
+```
+
+```{r, eval = FALSE, echo = FALSE}
 animated_plot <- ggplot() +
   geom_sf(data = states) +
   geom_point(aes(x = long, y = lat, colour = log(value)), data = time_series_stations) +
   transition_time(date_utc) +
-  scale_color_continuous_sequential(palette = "Heat")+
+  scale_color_continuous_sequential(palette = "Heat") +
   labs(subtitle = "Date: {frame_time}")
 
 anim_save("air_quality_map.gif", nframes = 300, fps = 10, width = 800, height = 600, animation = animated_plot, renderer = gifski_renderer())
-
 
 ```
