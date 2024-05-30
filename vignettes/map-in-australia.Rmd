@@ -74,7 +74,7 @@ head(au_east_coast_2020)
 
 We can visualise the stations by looking at their latitude and longitude from the dataset.
 
-```{r}
+```{r, fig.width = 12, fig.height = 6}
 states <- ozmaps::ozmap_states |>
   filter(NAME %in% c("New South Wales", "Victoria"))
 
@@ -83,7 +83,10 @@ stations <- au_east_coast_2020 |>
 
 ggplot(states) +
   geom_sf() +
-  geom_point(aes(x=long, y=lat), data = stations)
+  geom_point(aes(x = long, y = lat), data = stations) +
+  theme_bw() +
+  labs(x="Longitude", y="Latitude")
+  coord_sf()
 ```
 
 You can see that stations are most dense near major cities, with very little monitoring occurring in regional Australia.
