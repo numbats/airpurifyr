@@ -24,4 +24,4 @@ au_east_coast_2020 <- get_measurements_for_location(
     parameter = "pm25"
 )
 
-usethis::use_data(au_east_coast_2020, overwrite = TRUE)
+usethis::use_data(au_east_coast_2020, overwrite = TRUE, internal = TRUE)
