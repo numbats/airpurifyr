@@ -90,9 +90,9 @@ You can see that stations are most dense near major cities, with very little mon
 
 We can look at frequency reporting using a dotplot.
 
-```{r, fig.width=6}
+```{r, fig.width=12}
 ggplot(au_east_coast_2020, aes(x = date_utc, y = value, color = location)) +
-  geom_point() +
+  geom_point(size = 0.5) +
   guides(colour = "none") +
   labs(x = "Date", y = "pm2.5") +
   geom_hline(aes(yintercept = 500), linetype = "dashed")
