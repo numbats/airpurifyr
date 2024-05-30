@@ -77,7 +77,11 @@
 
     
     
-<p>This helps you to understand</p>
+<p>Here we walk through a basic workflow for working with OpenAQ data
+inside <code>airpurifyr</code>. The aim is to produce some plots about
+the <a href="https://en.wikipedia.org/wiki/2019%E2%80%9320_Australian_bushfire_season" class="external-link">2019-20
+Australian Bushfire Season</a>, where air quality was extremely
+poor.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://numbats.github.io/airpurifyr/">airpurifyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mdsumner/ozmaps" class="external-link">ozmaps</a></span><span class="op">)</span></span>
@@ -87,6 +91,17 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://colorspace.R-Forge.R-project.org/" class="external-link">colorspace</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tsibble.tidyverts.org" class="external-link">tsibble</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://gganimate.com" class="external-link">gganimate</a></span><span class="op">)</span></span></code></pre></div>
+<p>The first step when working with <code>airpurifyr</code> is to set
+your API key. Register your key at <a href="https://explore.openaq.org/register" class="external-link">https://explore.openaq.org/register</a>,
+and set this key using <code><a href="../reference/set_openaq_api_key.html">set_openaq_api_key()</a></code>. Note you
+<em>can</em> access data without an API key, but it is heavily
+restricted, so the package will give you a warning for each query you
+run without an API key set.</p>
+<p>With your API key set, our first task is to find all the locations on
+the east coast of Australia. This is non-trivial, as the “locations”
+provided by OpenAQ related to sensors rather than physical locations.
+The easiest (but most API intensive) method to get locations is to
+download for a large region, and then filter.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">all_aus_locations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_measurements_for_location.html">get_measurements_for_location</a></span><span class="op">(</span></span>
 <span>  country <span class="op">=</span> <span class="st">"AU"</span>,</span>
@@ -94,9 +109,19 @@
 <span>  date_from <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ymd</a></span><span class="op">(</span><span class="st">"2020-01-01"</span><span class="op">)</span>,</span>
 <span>  date_to <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ymd</a></span><span class="op">(</span><span class="st">"2020-01-14"</span><span class="op">)</span>,</span>
 <span>  parameter <span class="op">=</span> <span class="st">"pm25"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">locations_of_interest</span> <span class="op">&lt;-</span> <span class="va">all_aus_locations</span> <span class="op">|&gt;</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Here, we have asked for data from Australia, from 1 Jan 2020 to 14
+Jan 2020, restricted to pm2.5. Restricting the date range and the
+parameter means that we need less API calls. Considering we are only
+using this data to get a list of stations, the smaller the set the
+better.</p>
+<p>We recommend using about two weeks of time to get locations, as not
+all sensors report on all days.</p>
+<p>Next, we filter down these locations using latitude and longitude,
+and pull down the data we actually want for a much longer period of
+time.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">locations_of_interest</span> <span class="op">&lt;-</span> <span class="va">all_aus_locations</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># East coast of Australia (roughly)</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">long</span> <span class="op">&gt;</span> <span class="fl">141</span>, <span class="va">lat</span> <span class="op">&lt;</span> <span class="op">-</span><span class="fl">31</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">location</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -110,7 +135,28 @@
 <span>  date_to <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ymd</a></span><span class="op">(</span><span class="st">"2020-02-01"</span><span class="op">)</span>,</span>
 <span>  parameter <span class="op">=</span> <span class="st">"pm25"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<p>If you run this example, you’ll notice this query takes a very long
+time. This is because it is quite a few locations for 90 days, with
+sensors generally reporting hourly. Here we have increased the
+<code>max_observations</code> parameter which makes each query larger
+but reduces the number of queries. If you are having troubles with Error
+408 (HTTP timeout) then this can be a fix.</p>
+<p>The resulting data looks like this:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">au_east_coast_2020</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 9</span></span></span>
+<span><span class="co">#&gt;   location_id location parameter value date_utc            unit    lat  long</span></span>
+<span><span class="co">#&gt;         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>        <span style="text-decoration: underline;">2</span>487 Bathurst pm25        9.9 2020-02-01 <span style="color: #949494;">00:00:00</span> µg/m³ -<span style="color: #BB0000;">33.4</span>  150.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>        <span style="text-decoration: underline;">2</span>487 Bathurst pm25       10.3 2020-01-31 <span style="color: #949494;">23:00:00</span> µg/m³ -<span style="color: #BB0000;">33.4</span>  150.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>        <span style="text-decoration: underline;">2</span>487 Bathurst pm25       10.8 2020-01-31 <span style="color: #949494;">22:00:00</span> µg/m³ -<span style="color: #BB0000;">33.4</span>  150.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>        <span style="text-decoration: underline;">2</span>487 Bathurst pm25       11.3 2020-01-31 <span style="color: #949494;">21:00:00</span> µg/m³ -<span style="color: #BB0000;">33.4</span>  150.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>        <span style="text-decoration: underline;">2</span>487 Bathurst pm25       12.1 2020-01-31 <span style="color: #949494;">20:00:00</span> µg/m³ -<span style="color: #BB0000;">33.4</span>  150.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>        <span style="text-decoration: underline;">2</span>487 Bathurst pm25       12.4 2020-01-31 <span style="color: #949494;">19:00:00</span> µg/m³ -<span style="color: #BB0000;">33.4</span>  150.</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: country &lt;chr&gt;</span></span></span></code></pre></div>
+<p>We can visualise the stations by looking at their latitude and
+longitude from the dataset.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">states</span> <span class="op">&lt;-</span> <span class="fu">ozmaps</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/ozmaps/man/ozmap_states.html" class="external-link">ozmap_states</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">NAME</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"New South Wales"</span>, <span class="st">"Victoria"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -120,18 +166,24 @@
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">states</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">long</span>, y<span class="op">=</span><span class="va">lat</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">stations</span><span class="op">)</span></span></code></pre></div>
-<p><img src="map-in-australia_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">time_series_stations</span> <span class="op">&lt;-</span> <span class="va">au_east_coast_2020</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://tsibble.tidyverts.org/reference/as-tsibble.html" class="external-link">as_tsibble</a></span><span class="op">(</span>index <span class="op">=</span> <span class="va">date_utc</span>, key <span class="op">=</span> <span class="va">location</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://tsibble.tidyverts.org/reference/fill_gaps.html" class="external-link">fill_gaps</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fl">1</span>, .start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">au_east_coast_2020</span><span class="op">$</span><span class="va">date_utc</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">location</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/fill.html" class="external-link">fill</a></span><span class="op">(</span><span class="va">lat</span>, <span class="va">long</span>, .direction <span class="op">=</span> <span class="st">"downup"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">au_east_coast_2020</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">date_utc</span>, y <span class="op">=</span> <span class="va">value</span>, color <span class="op">=</span> <span class="va">location</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<p><img src="map-in-australia_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
+<p>You can see that stations are most dense near major cities, with very
+little monitoring occurring in regional Australia.</p>
+<p>We can look at frequency reporting using a dotplot.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">au_east_coast_2020</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">date_utc</span>, y <span class="op">=</span> <span class="va">value</span>, color <span class="op">=</span> <span class="va">location</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="map-in-australia_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Date"</span>, y <span class="op">=</span> <span class="st">"pm2.5"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="map-in-australia_files/figure-html/unnamed-chunk-3-1.png" width="576"></p>
+<p>Here, each set of dots represents one station. You can see that there
+are patches of missingness across all stations.</p>
+<p>You can also see the effects of the fires, represented by the large
+spikes in pm2.5 measurements. According to the <a href="https://www.epa.vic.gov.au/for-community/environmental-information/air-quality/pm25-particles-in-the-air" class="external-link">Victorian
+Environmental Protection Authority</a>, pm2.5 levels above 500 (marked
+by the dashed line in the previous plot) are considered “extremely
+poor”.</p>
   </main>
 </div>
 
