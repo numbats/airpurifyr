@@ -85,7 +85,7 @@ ggplot(states) +
   geom_sf() +
   geom_point(aes(x = long, y = lat), data = stations) +
   theme_bw() +
-  labs(x="Longitude", y="Latitude")
+  labs(x="Longitude", y="Latitude") +
   coord_sf()
 ```
 
