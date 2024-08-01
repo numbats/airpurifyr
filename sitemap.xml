@@ -1,42 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://numbats.github.io/airpurifyr/404.html</loc>
-  </url>
-  <url>
-    <loc>https://numbats.github.io/airpurifyr/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://numbats.github.io/airpurifyr/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://numbats.github.io/airpurifyr/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://numbats.github.io/airpurifyr/articles/map-in-australia.html</loc>
-  </url>
-  <url>
-    <loc>https://numbats.github.io/airpurifyr/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://numbats.github.io/airpurifyr/index.html</loc>
-  </url>
-  <url>
-    <loc>https://numbats.github.io/airpurifyr/reference/au_east_coast_2020.html</loc>
-  </url>
-  <url>
-    <loc>https://numbats.github.io/airpurifyr/reference/collate_paginated_output.html</loc>
-  </url>
-  <url>
-    <loc>https://numbats.github.io/airpurifyr/reference/get_measurements_for_location.html</loc>
-  </url>
-  <url>
-    <loc>https://numbats.github.io/airpurifyr/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://numbats.github.io/airpurifyr/reference/parse_measures.html</loc>
-  </url>
-  <url>
-    <loc>https://numbats.github.io/airpurifyr/reference/set_openaq_api_key.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://numbats.github.io/airpurifyr/404.html</loc></url>
+<url><loc>https://numbats.github.io/airpurifyr/LICENSE-text.html</loc></url>
+<url><loc>https://numbats.github.io/airpurifyr/LICENSE.html</loc></url>
+<url><loc>https://numbats.github.io/airpurifyr/articles/index.html</loc></url>
+<url><loc>https://numbats.github.io/airpurifyr/articles/map-in-australia.html</loc></url>
+<url><loc>https://numbats.github.io/airpurifyr/authors.html</loc></url>
+<url><loc>https://numbats.github.io/airpurifyr/index.html</loc></url>
+<url><loc>https://numbats.github.io/airpurifyr/reference/au_east_coast_2020.html</loc></url>
+<url><loc>https://numbats.github.io/airpurifyr/reference/collate_paginated_output.html</loc></url>
+<url><loc>https://numbats.github.io/airpurifyr/reference/get_measurements_for_location.html</loc></url>
+<url><loc>https://numbats.github.io/airpurifyr/reference/index.html</loc></url>
+<url><loc>https://numbats.github.io/airpurifyr/reference/parse_measures.html</loc></url>
+<url><loc>https://numbats.github.io/airpurifyr/reference/set_openaq_api_key.html</loc></url>
 </urlset>
+
