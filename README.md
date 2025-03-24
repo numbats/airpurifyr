@@ -10,6 +10,8 @@ As of 1 February 2025, OpenAQ is no longer operating the v2 endpoint that this p
 `airpurifyr` makes it easy to grab air quality data from
 [OpenAQ](https://www.openaq.org).
 
+# Previous instructions - no longer applicable, maintained here for archival purposes
+
 ## Installation
 
 You can install the development version of `airpurifyr` from
