@@ -1,5 +1,9 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+# NOTICE
+
+As of 1 February 2025, OpenAQ is no longer operating the v2 endpoint that this package relies on. We have been advised that OpenAQ are working on their own R package, and as such this package is now officially discontinued, and no longer operational.
+
 
 # airpurifyr <img src="man/figures/logo.png" align="right" height="139" alt="" />
 
